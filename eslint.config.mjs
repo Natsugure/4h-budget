@@ -32,7 +32,7 @@ const eslintConfig = defineConfig([
           resources: {
             routeHandlers: true,
             serverFunctions: true,
-            serverComponentEntrypoints: false,
+            serverComponentEntrypoints: true,
           },
         },
       ],
