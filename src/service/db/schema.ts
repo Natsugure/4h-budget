@@ -18,6 +18,7 @@ export const categories = pgTable("categories", {
   color: text("color").$type<string>().notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  deletedAt: timestamp("deleted_at"),
 }, (table) => [
   check("name_length", sql`char_length(${table.name}) <= 255`),
   check("description_length", sql`${table.description} IS NULL OR char_length(${table.description}) <= 10000`),
