@@ -13,6 +13,7 @@ export const users = pgTable("users", {
 
 export const categories = pgTable("categories", {
   id: uuid('id').primaryKey().default(sql`uuidv7()`),
+  userId: uuid("user_id").references(() => users.id).notNull(),
   name: text("name").notNull(),
   description: text("description"),
   color: text("color").$type<string>().notNull(),
@@ -32,17 +33,24 @@ export const sessions = pgTable("sessions", {
   startTime: timestamp("start_time").notNull(),
   endTime: timestamp("end_time"),
   memo: text("memo"),
+  /** 記録方式（ `"auto" | "manual"` ）  */
   method: text("method").$type<SessionMethod>(),
+  /** 記録元（`"web" | "mobile" | "desktop" | "crx" | "other"` ）  */
   source: text("source").$type<SessionSource>(),
   taskLabel: text("task_label"),
+  /** タスク開始前に見積もった作業時間（分） */
   estimatedMinutes: integer("estimated_minutes"),
+  /** タスクそのものに対する満足度（1〜7の7段階） */
   satisfactionTask: integer("satisfaction_task"),
+  /** このタスクの仕事・目標への寄与度（1〜7の7段階） */
   satisfactionContribution: integer("satisfaction_contribution"),
+  /**このタスクに費やした時間に対する満足度（1〜7の7段階） */
   satisfactionTime: integer("satisfaction_time"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 }, (table) => [
   check("memo_length", sql`${table.memo} IS NULL OR char_length(${table.memo}) <= 10000`),
+  check("task_label_length", sql`${table.taskLabel} IS NULL OR char_length(${table.taskLabel}) <= 255`),
   check("start_time_before_end_time", sql`${table.startTime} < ${table.endTime}`),
   check("end_time_after_start_time", sql`${table.endTime} > ${table.startTime}`),
   check(
