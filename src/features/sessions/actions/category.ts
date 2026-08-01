@@ -11,6 +11,7 @@ import { getAuthUserId } from "@/features/auth/actions/getAuthUserId"
 type NewCategoryInput = Omit<NewCategory, "userId">
 type CategoryUpdateInput = Partial<Omit<NewCategory, "id" | "userId" | "createdAt" | "updatedAt" | "deletedAt">>
 
+// eslint-disable-next-line @clerk/next/require-auth-protection -- 認証は getAuthUserId() の Result<T, AuthError> で行っている
 export async function getCategories(): Promise<Result<Category[], AppError>> {
   const authResult = await getAuthUserId()
   if (!authResult.ok) {
@@ -34,6 +35,7 @@ export async function getCategories(): Promise<Result<Category[], AppError>> {
   }
 }
 
+// eslint-disable-next-line @clerk/next/require-auth-protection -- 認証は getAuthUserId() の Result<T, AuthError> で行っている
 export async function createCategory(item: NewCategoryInput): Promise<Result<Category, AppError>> {
   const authResult = await getAuthUserId()
   if (!authResult.ok) {
@@ -49,6 +51,7 @@ export async function createCategory(item: NewCategoryInput): Promise<Result<Cat
   }
 }
 
+// eslint-disable-next-line @clerk/next/require-auth-protection -- 認証は getAuthUserId() の Result<T, AuthError> で行っている
 export async function updateCategory(id: string, item: CategoryUpdateInput): Promise<Result<Category, AppError>> {
   const authResult = await getAuthUserId()
   if (!authResult.ok) {
@@ -76,6 +79,7 @@ export async function updateCategory(id: string, item: CategoryUpdateInput): Pro
   }
 }
 
+// eslint-disable-next-line @clerk/next/require-auth-protection -- 認証は getAuthUserId() の Result<T, AuthError> で行っている
 export async function deleteCategory(id: string): Promise<Result<void, AppError>> {
   const authResult = await getAuthUserId()
   if (!authResult.ok) {

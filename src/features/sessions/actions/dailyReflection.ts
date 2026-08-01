@@ -10,6 +10,7 @@ import { type AppError, databaseError, notFoundError } from "@/shared/errors"
 
 export type CreateDailyReflectionInput = Omit<NewDailyReflection, "id" | "userId" | "createdAt" | "updatedAt">
 
+// eslint-disable-next-line @clerk/next/require-auth-protection -- 認証は getAuthUserId() の Result<T, AuthError> で行っている
 export async function getDailyReflections(): Promise<Result<DailyReflection[], AppError>> {
   const authResult = await getAuthUserId()
   if (!authResult.ok) {
@@ -24,6 +25,7 @@ export async function getDailyReflections(): Promise<Result<DailyReflection[], A
   }
 }
 
+// eslint-disable-next-line @clerk/next/require-auth-protection -- 認証は getAuthUserId() の Result<T, AuthError> で行っている
 export async function getLatestDailyReflection(): Promise<Result<DailyReflection, AppError>> {
   const authResult = await getAuthUserId()
   if (!authResult.ok) {
@@ -47,6 +49,7 @@ export async function getLatestDailyReflection(): Promise<Result<DailyReflection
   }
 }
 
+// eslint-disable-next-line @clerk/next/require-auth-protection -- 認証は getAuthUserId() の Result<T, AuthError> で行っている
 export async function createDailyReflection(item: CreateDailyReflectionInput): Promise<Result<DailyReflection, AppError>> {
   const authResult = await getAuthUserId()
   if (!authResult.ok) {
@@ -62,6 +65,7 @@ export async function createDailyReflection(item: CreateDailyReflectionInput): P
   }
 }
 
+// eslint-disable-next-line @clerk/next/require-auth-protection -- 認証は getAuthUserId() の Result<T, AuthError> で行っている
 export async function updateDailyReflection(id: string, content: string): Promise<Result<DailyReflection, AppError>> {
   const authResult = await getAuthUserId()
   if (!authResult.ok) {
@@ -89,6 +93,7 @@ export async function updateDailyReflection(id: string, content: string): Promis
   }
 }
 
+// eslint-disable-next-line @clerk/next/require-auth-protection -- 認証は getAuthUserId() の Result<T, AuthError> で行っている
 export async function deleteDailyReflection(id: string): Promise<Result<void, AppError>> {
   const authResult = await getAuthUserId()
   if (!authResult.ok) {

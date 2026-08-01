@@ -12,6 +12,7 @@ export type StartSessionInput = Pick<NewSession, "userId" | "categoryId" | "star
 export type SessionUpdateInput = Partial<Omit<NewSession, "id" | "userId" | "createdAt" | "updatedAt">>
 export type SessionSatisfactionInput = Pick<NewSession, "satisfactionTask" | "satisfactionContribution" | "satisfactionTime">
 
+// eslint-disable-next-line @clerk/next/require-auth-protection -- 認証は getAuthUserId() の Result<T, AuthError> で行っている
 export async function getAllSessions(): Promise<Result<Session[], AppError>> {
   const authResult = await getAuthUserId()
   if (!authResult.ok) {
@@ -27,6 +28,7 @@ export async function getAllSessions(): Promise<Result<Session[], AppError>> {
   }
 }
 
+// eslint-disable-next-line @clerk/next/require-auth-protection -- 認証は getAuthUserId() の Result<T, AuthError> で行っている
 export async function getSessionsByDate(date: Date): Promise<Result<Session[], AppError>> {
   const authResult = await getAuthUserId()
   if (!authResult.ok) {
@@ -47,6 +49,7 @@ export async function getSessionsByDate(date: Date): Promise<Result<Session[], A
   }
 }
 
+// eslint-disable-next-line @clerk/next/require-auth-protection -- 認証は getAuthUserId() の Result<T, AuthError> で行っている
 export async function getLatestSession(): Promise<Result<Session, AppError>> {
   const authResult = await getAuthUserId()
   if (!authResult.ok) {
@@ -67,6 +70,7 @@ export async function getLatestSession(): Promise<Result<Session, AppError>> {
   }
 }
 
+// eslint-disable-next-line @clerk/next/require-auth-protection -- 認証は getAuthUserId() の Result<T, AuthError> で行っている
 export async function startSession(item: StartSessionInput): Promise<Result<void, AppError>> {
   try {
     await db.insert(sessions).values(item)
@@ -76,6 +80,7 @@ export async function startSession(item: StartSessionInput): Promise<Result<void
   }
 }
 
+// eslint-disable-next-line @clerk/next/require-auth-protection -- 認証は getAuthUserId() の Result<T, AuthError> で行っている
 export async function endSession(id: string, endTime: Date): Promise<Result<Session, AppError>> {
   const authResult = await getAuthUserId()
   if (!authResult.ok) {
@@ -107,6 +112,7 @@ export async function endSession(id: string, endTime: Date): Promise<Result<Sess
   }
 }
 
+// eslint-disable-next-line @clerk/next/require-auth-protection -- 認証は getAuthUserId() の Result<T, AuthError> で行っている
 export async function setSessionSatisfaction(id: string, satisfaction: SessionSatisfactionInput) {
   const authResult = await getAuthUserId()
   if (!authResult.ok) {
@@ -136,6 +142,7 @@ export async function setSessionSatisfaction(id: string, satisfaction: SessionSa
   }
 }
 
+// eslint-disable-next-line @clerk/next/require-auth-protection -- 認証は getAuthUserId() の Result<T, AuthError> で行っている
 export async function updateSession(id: string, item: SessionUpdateInput) {
   const authResult = await getAuthUserId()
   if (!authResult.ok) {
@@ -165,6 +172,7 @@ export async function updateSession(id: string, item: SessionUpdateInput) {
   }
 }
 
+// eslint-disable-next-line @clerk/next/require-auth-protection -- 認証は getAuthUserId() の Result<T, AuthError> で行っている
 export async function deleteSession(id: string): Promise<Result<void, AppError>> {
   const authResult = await getAuthUserId()
   if (!authResult.ok) {
