@@ -8,7 +8,7 @@ import { type AppError, databaseError, notFoundError } from "@/shared/errors"
 import { desc, eq, and, isNull } from "drizzle-orm"
 import { getAuthUserId } from "@/features/auth/actions/getAuthUserId"
 
-export type StartSessionInput = Pick<NewSession, "userId" | "categoryId" | "startTime" | "estimatedMinutes" | "taskLabel" | "source">
+export type StartSessionInput = Pick<NewSession, "categoryId" | "startTime" | "estimatedMinutes" | "taskLabel" | "source">
 export type SessionUpdateInput = Partial<Omit<NewSession, "id" | "userId" | "createdAt" | "updatedAt">>
 export type SessionSatisfactionInput = Pick<NewSession, "satisfactionTask" | "satisfactionContribution" | "satisfactionTime">
 
@@ -58,13 +58,17 @@ export async function getLatestSession(): Promise<Result<Session, AppError>> {
   const userId = authResult.data
   
   try {
-    const result = await db
+    const [data] = await db
       .select()
       .from(sessions)
       .where(eq(sessions.userId, userId))
       .orderBy(desc(sessions.startTime))
       .limit(1)
-    return ok(result[0])
+
+    if (!data) {
+      return err(notFoundError("Session"))
+    }
+    return ok(data)
   } catch {
     return err(databaseError("Sessionの取得に失敗しました"))
   }
@@ -72,11 +76,17 @@ export async function getLatestSession(): Promise<Result<Session, AppError>> {
 
 // eslint-disable-next-line @clerk/next/require-auth-protection -- 認証は getAuthUserId() の Result<T, AuthError> で行っている
 export async function startSession(item: StartSessionInput): Promise<Result<void, AppError>> {
+  const authResult = await getAuthUserId()
+  if (!authResult.ok) {
+    return err(authResult.error)
+  }
+  const userId = authResult.data
+  
   try {
-    await db.insert(sessions).values(item)
+    await db.insert(sessions).values({ ...item, userId })
     return ok(undefined)
   } catch {
-    throw new Error("Sessionの作成に失敗しました")
+    return err(databaseError("Sessionの作成に失敗しました"))
   }
 }
 
@@ -89,7 +99,7 @@ export async function endSession(id: string, endTime: Date): Promise<Result<Sess
   const userId = authResult.data
   
   try {
-    const updated = await db
+    const [result] = await db
       .update(sessions)
       .set({ endTime, updatedAt: new Date() })
       .where(
@@ -101,11 +111,11 @@ export async function endSession(id: string, endTime: Date): Promise<Result<Sess
       )
       .returning()
 
-    if (updated.length === 0) {
+    if (!result) {
       return err(notFoundError("Session"))
     }
 
-    return ok(updated[0])
+    return ok(result)
     
   } catch {
     return err(databaseError("Sessionの終了に失敗しました"))
@@ -121,7 +131,7 @@ export async function setSessionSatisfaction(id: string, satisfaction: SessionSa
   const userId = authResult.data
   
   try {
-    const updated = await db
+    const [result] = await db
       .update(sessions)
       .set({ ...satisfaction, updatedAt: new Date() })
       .where(
@@ -132,11 +142,11 @@ export async function setSessionSatisfaction(id: string, satisfaction: SessionSa
       )
       .returning()
 
-    if (updated.length === 0) {
+    if (!result) {
       return err(notFoundError("Session"))
     }
 
-    return ok(updated[0])
+    return ok(result)
   } catch {
     return err(databaseError("Sessionの評価設定に失敗しました"))
   }
@@ -151,7 +161,7 @@ export async function updateSession(id: string, item: SessionUpdateInput) {
   const userId = authResult.data
   
   try {
-    const updated = await db
+    const [result] = await db
       .update(sessions)
       .set({ ...item, updatedAt: new Date() })
       .where(
@@ -162,11 +172,11 @@ export async function updateSession(id: string, item: SessionUpdateInput) {
       )
       .returning()
 
-    if (updated.length === 0) {
+    if (!result) {
       return err(notFoundError("Session"))
     }
 
-    return ok(updated[0])
+    return ok(result)
   } catch {
     return err(databaseError("Sessionの更新に失敗しました"))
   }
@@ -181,7 +191,7 @@ export async function deleteSession(id: string): Promise<Result<void, AppError>>
   const userId = authResult.data
   
   try {
-    const deleted = await db
+    const [result] = await db
       .delete(sessions)
       .where(
         and(
@@ -191,7 +201,7 @@ export async function deleteSession(id: string): Promise<Result<void, AppError>>
       )
       .returning()
 
-    if (deleted.length === 0) {
+    if (!result) {
       return err(notFoundError("Session"))
     }
 

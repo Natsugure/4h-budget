@@ -45,6 +45,9 @@ export async function createCategory(item: NewCategoryInput): Promise<Result<Cat
   
   try {
     const [data] = await db.insert(categories).values({ ...item, userId }).returning()
+    if (!data) {
+      return err(databaseError("Categoryの作成に失敗しました"))
+    }
     return ok(data)
   } catch {
     return err(databaseError("Categoryの作成に失敗しました"))

@@ -34,16 +34,16 @@ export async function getLatestDailyReflection(): Promise<Result<DailyReflection
   const userId = authResult.data
   
   try {
-    const result = await db
+    const [data] = await db
       .select()
       .from(dailyReflections)
       .where(eq(dailyReflections.userId, userId))
       .orderBy(desc(dailyReflections.date))
       .limit(1)
-    if (!result[0]) {
+    if (!data) {
       return err(notFoundError("DailyReflection"))
     }
-    return ok(result[0])
+    return ok(data)
   } catch {
     return err(databaseError("DailyReflectionの取得に失敗しました"))
   }
@@ -58,8 +58,11 @@ export async function createDailyReflection(item: CreateDailyReflectionInput): P
   const userId = authResult.data
   
   try {
-    const [data] = await db.insert(dailyReflections).values({ ...item, userId }).returning()
-    return ok(data)
+    const [result] = await db.insert(dailyReflections).values({ ...item, userId }).returning()
+    if (!result) {
+      return err(databaseError("DailyReflectionの作成に失敗しました"))
+    }
+    return ok(result)
   } catch {
     return err(databaseError("DailyReflectionの作成に失敗しました"))
   }
@@ -74,7 +77,7 @@ export async function updateDailyReflection(id: string, content: string): Promis
   const userId = authResult.data
   
   try {
-    const [data] = await db
+    const [result] = await db
       .update(dailyReflections)
       .set({ content, updatedAt: new Date() })
       .where(
@@ -84,10 +87,10 @@ export async function updateDailyReflection(id: string, content: string): Promis
         )
       )
       .returning()
-    if (!data) {
+    if (!result) {
       return err(notFoundError("DailyReflection"))
     }
-    return ok(data)
+    return ok(result)
   } catch {
     return err(databaseError("DailyReflectionの更新に失敗しました"))
   }
