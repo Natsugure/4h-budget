@@ -27,8 +27,15 @@ const eslintConfig = defineConfig([
       '@clerk/next/require-auth-protection': [
         'error',
         {
-          protected: ['src/app/dashboard/**', 'src/actions/dashboard/**'],
-          public: ['src/app/sign-in/**', 'src/app/sign-up/**'],
+          protected: [
+            'src/app/dashboard/**',
+            'src/actions/dashboard/**', 
+            'src/features/**/actions/**'
+          ],
+          public: [
+            'src/app/sign-in/**',
+            'src/app/sign-up/**'
+          ],
           resources: {
             routeHandlers: true,
             serverFunctions: true,
